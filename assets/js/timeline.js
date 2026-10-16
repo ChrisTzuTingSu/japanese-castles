@@ -1,9 +1,0 @@
-
-let events=[];const minY=1450,maxY=2026;const castlesOrder=['熊本城','姬路城','大阪城','廣島城','名古屋城','江戶城'];
-fetch('data/events.json').then(r=>r.json()).then(d=>{events=d;buildRows();updateYear(1600)});
-const pct=y=>(y-minY)/(maxY-minY)*100;
-function buildRows(){const box=document.querySelector('.timelineRows');box.innerHTML=castlesOrder.map(name=>{const ev=events.filter(e=>e.castle===name);return `<div class="timelineRow"><div class="timelineName">${name}</div><div class="track" data-castle="${name}">${ev.map(e=>`<span class="eventLabel" style="left:${pct(e.year)}%">${e.year}</span><button class="eventDot" data-type="${e.type}" data-year="${e.year}" data-title="${e.title}" style="left:${pct(e.year)}%" title="${e.year} ${e.title}"></button>`).join('')}<div class="yearLine"></div></div></div>`}).join('');document.querySelectorAll('.eventDot').forEach(d=>d.addEventListener('click',()=>updateYear(+d.dataset.year)));}
-function updateYear(y){document.querySelector('#yearRange').value=y;document.querySelector('#yearValue').textContent=y;document.querySelectorAll('.yearLine').forEach(l=>l.style.left=pct(y)+'%');const near=events.filter(e=>Math.abs(e.year-y)<=12).sort((a,b)=>Math.abs(a.year-y)-Math.abs(b.year-y)).slice(0,6);document.querySelector('.eventCards').innerHTML=near.length?near.map(e=>`<div class="eventCard"><small>${e.castle}</small><b>${e.year}｜${e.title}</b><p>${e.text}</p></div>`).join(''):`<div class="eventCard"><b>${y}</b><p>目前範例資料中，這個年份附近沒有事件。移動時間軸或點擊事件節點。</p></div>`;const context=y<1573?'戰國時代':y<1603?'織豐時代':y<1868?'江戶時代':y<1912?'明治時代':y<1945?'近代日本':y<1989?'戰後昭和':'平成・令和';document.querySelector('#eraName').textContent=context;}
-document.querySelector('#yearRange').addEventListener('input',e=>updateYear(+e.target.value));
-
-const oldUpdate=updateYear; updateYear=function(y){oldUpdate(y); const sy=document.querySelector('#selectedYear'); if(sy) sy.textContent=y;}
